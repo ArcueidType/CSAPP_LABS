@@ -227,7 +227,11 @@ int conditional(int x, int y, int z) {
  *   Rating: 3
  */
 int isLessOrEqual(int x, int y) {
-  return 2;
+  int sx=(x>>31)&1;
+  int sy=(y>>31)&1;
+  int dif=y+(~x+1);
+  int sdif=(dif>>31)&1;
+  return (sx&!sy)|(!(sx^sy)&!sdif);
 }
 //4
 /* 
