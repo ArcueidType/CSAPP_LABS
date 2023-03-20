@@ -204,7 +204,9 @@ int negate(int x) {
  *   Rating: 3
  */
 int isAsciiDigit(int x) {
-  return 2;
+  int isa=!((x+(~0x30+1))>>31);
+  int isb=!((0x39+(~x+1))>>31);
+  return isa&isb;
 }
 /* 
  * conditional - same as x ? y : z 
@@ -214,7 +216,8 @@ int isAsciiDigit(int x) {
  *   Rating: 3
  */
 int conditional(int x, int y, int z) {
-  return 2;
+  int flag=((!!x)<<31)>>31;
+  return (flag&y)|((~flag)&z);
 }
 /* 
  * isLessOrEqual - if x <= y  then return 1, else return 0 
