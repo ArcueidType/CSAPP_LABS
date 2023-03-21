@@ -258,7 +258,25 @@ int logicalNeg(int x) {
  *  Rating: 4
  */
 int howManyBits(int x) {
-  return 0;
+  int sum=0;
+  int nx = ((x>>31)&~x)|(~(x>>31)&x);
+  int p = (!!(nx>>16))<<4;
+  nx = nx>>p;
+  sum+=p;
+  p = (!!(nx>>8))<<3;
+  nx = nx>>p;
+  sum+=p;
+  p = (!!(nx>>4))<<2;
+  nx = nx>>p;
+  sum+=p;
+  p = (!!(nx>>2))<<1;
+  nx = nx>>p;
+  sum+=p;
+  p = !!(nx>>1);
+  nx = nx>>p;
+  sum+=p;
+  sum+=nx;
+  return sum+1;
 }
 //float
 /* 
