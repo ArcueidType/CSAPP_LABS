@@ -314,11 +314,11 @@ unsigned floatScale2(unsigned uf) {
  */
 int floatFloat2Int(unsigned uf) {
   unsigned sign=(uf&0x80000000)>>31;
-  int exp=(uf&0x7f800000);
+  int exp=(uf&0x7f800000)>>23;
   unsigned f=uf&0x007fffff|0x00800000;
   if(exp==0) return 0;
   if(exp==0x7f800000) return 0x80000000u;
-  exp=(exp>>23)-127;
+  exp-=127;
   if(exp<0) return 0;
   if(exp>=31) return 0x80000000u;
   if(exp>23) f=f<<(exp-23);
