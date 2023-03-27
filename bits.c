@@ -152,9 +152,7 @@ int bitXor(int x, int y) {
  *   Rating: 1
  */
 int tmin(void) {
-
   return 1<<31;
-
 }
 //2
 /*
@@ -206,7 +204,7 @@ int negate(int x) {
 int isAsciiDigit(int x) {
   int isa=!((x+(~0x30+1))>>31);
   int isb=!((0x39+(~x+1))>>31);
-  return isa&isb;
+  return isa&isb&(!(x>>31));
 }
 /* 
  * conditional - same as x ? y : z 
@@ -255,6 +253,7 @@ int logicalNeg(int x) {
  *            howManyBits(0x80000000) = 32
  *  Legal ops: ! ~ & ^ | + << >>
  *  Max ops: 90
+ 
  *  Rating: 4
  */
 int howManyBits(int x) {
@@ -292,7 +291,7 @@ int howManyBits(int x) {
  */
 unsigned floatScale2(unsigned uf) {
   unsigned sign = uf&0x80000000;
-  unsigned exp=uf&0x7f800000;
+  int exp=uf&0x7f800000;
   unsigned f=uf&0x007fffff;
   if(exp==0) return (uf<<1)|sign;
   else if(exp==0x7f800000) return uf;
@@ -307,7 +306,8 @@ unsigned floatScale2(unsigned uf) {
  *   it is to be interpreted as the bit-level representation of a
  *   single-precision floating point value.
  *   Anything out of range (including NaN and infinity) should return
- *   0x80000000u.
+ *   
+ .
  *   Legal ops: Any integer/unsigned operations incl. ||, &&. also if, while
  *   Max ops: 30
  *   Rating: 4
