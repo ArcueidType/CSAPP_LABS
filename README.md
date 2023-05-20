@@ -1,3 +1,3 @@
 # Update Log:
 
-## 19/5/23 initialize project
+## 19/5/23 initialize "project"
