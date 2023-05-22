@@ -17,7 +17,7 @@ int s, E, b;
 
 typedef struct cacheLine{
     int bitValid;
-    unsigned long tag;
+    int tag;
     int time;
 } cacheLine;
 
@@ -25,15 +25,16 @@ typedef struct cacheLine{
 
 cacheLine **allocateCache(int s, int E, int b){
     int setNum = 1<<s;
+    int blockNum = 1<<b;
     cacheLine **cache;
     cache = (cacheLine **)malloc(setNum*sizeof(cacheLine *));
-    for(int i=0;i<setNum;i++){
-	cache[i]=(cacheLine *)malloc(E*sizeof(cacheLine));
+    for(int i=0;i<E;i++){
+	cache[i]=(cacheLine *)malloc(blockNum*sizeof(cacheLine));
     }
     for(int i=0;i<setNum;i++){
 	for(int j=0;j<E;j++){
 	    cache[i][j].bitValid = 0;
-	    cache[i][j].tag = -1lu;
+	    cache[i][j].tag = -1;
 	    cache[i][j].time = 0;
 	}
     }
@@ -41,10 +42,10 @@ cacheLine **allocateCache(int s, int E, int b){
 }
 
 void update(unsigned long address, cacheLine **cache){
-    int newSetIndex = (address>>b) % (1<<s);
-    unsigned long newTag = address>>(s+b);
+    int newSetIndex = ((-1u)>>(8-s)) & (address>>b);
+    int newTag = ((-1u)>>(s+b)) & address;
     for(int i=0;i<E;i++){
-	if(cache[newSetIndex][i].tag==newTag && cache[newSetIndex][i].bitValid==1){
+	if(cache[newSetIndex][i].bitValid==1 && cache[newSetIndex][i].tag==newTag){
 	    countHits++;
 	    cache[newSetIndex][i].time = 0;
 	    return;
@@ -87,7 +88,7 @@ void handleTrace(FILE *fp, cacheLine **cache){
     char opt;
     unsigned long int addr;
     int size;
-    while(fscanf(fp, "%c %lx,%d", &opt, &addr, &size) > 0){
+    while(fscanf(fp, "%c %lux,%d", &opt, &addr, &size) > 0){
 	switch(opt){
 	    case 'I':
 		break;
@@ -134,7 +135,7 @@ int main(int argc, char *argv[])
     }
     cacheLine **cache = allocateCache(s, E, b);
     handleTrace(fp, cache);
-    for(int i=0;i<(1<<s);i++) free(cache[i]);
+    for(int i=0;i<E;i++) free(cache[i]);
     free(cache);
     fclose(fp);
     printSummary(countHits, countMisses, countEvictions);
