@@ -1,9 +1,5 @@
 # CSAPP Lab4 CacheLab
 
-## Author: 韩晨旭
-
-## Student ID: 10225101440
-
 ### Cache基本结构：
 
 Cache（高速缓存）由S个组（Set）组成，其中每个组由E个行（CacheLine）组成，每个CacheLine由B个块（Block）组成
