@@ -33,19 +33,19 @@ void helpUsage(void){
     printf("-t <file>: Path of trace file.\n");
 }
 
-cache allocateCache(int s, int E, int b){
+cache allocateCache(){
     int setNum = 1<<s;
     cache myCache;
     myCache = (cache)malloc(setNum*sizeof(cacheSet));
     for(int i=0;i<setNum;i++){
-	myCache[i]=(cacheSet)malloc(E*sizeof(cacheLine));
+        myCache[i]=(cacheSet)malloc(E*sizeof(cacheLine));
     }
     for(int i=0;i<setNum;i++){
-	for(int j=0;j<E;j++){
-	    myCache[i][j].bitValid = 0;
-	    myCache[i][j].tag = -1lu;
-	    myCache[i][j].time = 0;
-	}
+        for(int j=0;j<E;j++){
+            myCache[i][j].bitValid = 0;
+            myCache[i][j].tag = -1lu;
+            myCache[i][j].time = 0;
+        }
     }
     return myCache;
 }
@@ -55,32 +55,32 @@ void loadOrStore(unsigned long address, char op, int size, cache myCache){
     unsigned long newTag = address>>(s+b);
     if(verboseFlag && !isModifying) printf("%c %lx,%d", op, address, size);
     for(int i=0;i<E;i++){
-	if(myCache[newSetIndex][i].tag==newTag && myCache[newSetIndex][i].bitValid==1){
-	    if(verboseFlag) printf(" hit");
-	    countHits++;
-	    myCache[newSetIndex][i].time = 0;
-	    return;
-	}
+        if(myCache[newSetIndex][i].tag==newTag && myCache[newSetIndex][i].bitValid==1){
+            if(verboseFlag) printf(" hit");
+            countHits++;
+            myCache[newSetIndex][i].time = 0;
+            return;
+        }
     }
 
     countMisses++;
     if(verboseFlag) printf(" miss");
     for(int i=0;i<E;i++){
-	if(myCache[newSetIndex][i].bitValid==0){
-	    myCache[newSetIndex][i].bitValid = 1;
-	    myCache[newSetIndex][i].tag = newTag;
-	    myCache[newSetIndex][i].time = 0;
-	    return;
-	}
+        if(myCache[newSetIndex][i].bitValid==0){
+            myCache[newSetIndex][i].bitValid = 1;
+            myCache[newSetIndex][i].tag = newTag;
+            myCache[newSetIndex][i].time = 0;
+            return;
+        }
     }
     
     int evictLine=0;
     countEvictions++;
     if(verboseFlag) printf(" eviction");
     for(int i=0;i<E;i++){
-	if(myCache[newSetIndex][i].time > myCache[newSetIndex][evictLine].time){
-	    evictLine = i;
-	}
+        if(myCache[newSetIndex][i].time > myCache[newSetIndex][evictLine].time){
+            evictLine = i;
+        }
     }
     myCache[newSetIndex][evictLine].tag = newTag;
     myCache[newSetIndex][evictLine].time = 0;
@@ -99,9 +99,9 @@ void modify(unsigned long address, int size, cache myCache){
 void updateTime(cache myCache){
     int setNum = 1<<s;
     for(int i=0;i<setNum;i++){
-	for(int j=0;j<E;j++){
-	    if(myCache[i][j].bitValid == 1) myCache[i][j].time++;
-	}
+        for(int j=0;j<E;j++){
+            if(myCache[i][j].bitValid == 1) myCache[i][j].time++;
+        }
     }
     return;
 }
@@ -111,25 +111,30 @@ void handleTrace(FILE *fp, cache myCache){
     unsigned long int addr;
     int size;
     while(fscanf(fp, "%c %lx,%d", &opt, &addr, &size) > 0){
-	switch(opt){
-	    case 'I':
-		break;
-	    case 'M':
-		modify(addr, size, myCache);
-		printf("\n");
-		break;
-	    case 'L':
-		loadOrStore(addr, 'L', size, myCache);
-		printf("\n");
-		break;
-	    case 'S':
-		loadOrStore(addr, 'S', size, myCache);
-		printf("\n");
-		break;
-	}
+        switch(opt){
+            case 'I':
+                break;
+            case 'M':
+                modify(addr, size, myCache);
+                printf("\n");
+                break;
+            case 'L':
+                loadOrStore(addr, 'L', size, myCache);
+                printf("\n");
+                break;
+            case 'S':
+                loadOrStore(addr, 'S', size, myCache);
+                printf("\n");
+                break;
+        }
         updateTime(myCache);
     }
     return;
+}
+
+void freeCache(cache myCache){
+    for(int i=0;i<(1<<s);i++) free(myCache[i]);
+    free(myCache);
 }
 
 int main(int argc, char *argv[])
@@ -138,36 +143,43 @@ int main(int argc, char *argv[])
     int opt;
     int helpUsageFlag=0;
     while((opt = getopt(argc, argv, "hvs:E:b:t:")) != -1){
-	switch(opt){
-	    case 'h':
-		helpUsageFlag=1;
-		break;
-	    case 'v':
-		verboseFlag=1;
-		break;
-	    case 's':
-		s = atoi(optarg);
-		break;
-	    case 'E':
-		E = atoi(optarg);
-		break;
-	    case 'b':
-		b = atoi(optarg);
-		break;
-	    case 't':
-		fp = fopen(optarg, "r");
-		break;
-	}		
+        switch(opt){
+            case 'h':
+                helpUsageFlag=1;
+                break;
+            case 'v':
+                verboseFlag=1;
+                break;
+            case 's':
+                s = atoi(optarg);
+                break;
+            case 'E':
+                E = atoi(optarg);
+                break;
+            case 'b':
+                b = atoi(optarg);
+                break;
+            case 't':
+                fp = fopen(optarg, "r");
+                break;
+            default:
+                helpUsageFlag=1;
+                break;
+        }
     }
+    
     if(helpUsageFlag==1 || s<=0 || E<=0 || b<=0 || fp==NULL){
-	helpUsage();
-	return 0;
+        helpUsage();
+        return 0;
     }
-    cache myCache = allocateCache(s, E, b);
+    
+    cache myCache = allocateCache();
     handleTrace(fp, myCache);
-    for(int i=0;i<(1<<s);i++) free(myCache[i]);
-    free(myCache);
-    fclose(fp);
+    
     printSummary(countHits, countMisses, countEvictions);
+    
+    freeCache(myCache);
+    fclose(fp);
+    
     return 0;
 }
