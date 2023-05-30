@@ -1,6 +1,5 @@
 /* ################################# 
- * Author:Chenxu "Arcueid" Han
- * ID: 10225101440
+ * Author:Arcueid
  * ################################# */
 
 #include "cachelab.h"
