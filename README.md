@@ -1,8 +1,6 @@
 # CSAPP Lab5 MallocLab
 
-## Author: 韩晨旭
-
-## Student ID: 10225101440
+## Author: Arcueid
 
 ## 实验目的：实现堆内存分配管理(malloc, free...)
 
@@ -329,8 +327,3 @@
     mm_free(old_ptr);
     return new_ptr;
 ```
-
-### 实验收获
-
-本次实验中，我更深刻的理解了malloc等一系列函数的工作原理以及实现方式的多样化，加深了对显式空闲链表的印象以及理解，同时也对第九章，虚拟内存有了更多的认识
-
