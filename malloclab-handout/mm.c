@@ -44,32 +44,43 @@ team_t team = {
 
 #define SIZE_T_SIZE (ALIGN(sizeof(size_t)))
 
+/* some useful sizes */
 #define WSIZE 4
 #define DSIZE 8
 #define MINBLOCK 24
 #define CHUNKSIZE (1<<12)
 
+/* get maximum value of x and y */
 #define MAX(x, y) ((x)>(y)? (x):(y))
 
+/* pack up size and whether allocated */
 #define PACK(size, alloc) ((size)|(alloc))
 
+/* get or put value or address(pointer) to an address */
 #define GET(p) (*(unsigned int *)(p))
 #define PUT(p, val) (*(unsigned int *)(p) = (val))
 #define GETADDR(p)         (*(unsigned int **)(p))
 #define PUTADDR(p, addr)   (*(unsigned int **)(p) = (unsigned int *)(addr))
 
+/* get the size of the block */
 #define GET_SIZE(p) (GET(p) & ~0x7)
+
+/* whether the block is allocated */
 #define GET_ALLOC(p) (GET(p) & 0x1)
 
+/* calculate address of header or footer of block pointed by bp */
 #define HDRP(bp) ((char *)(bp) - WSIZE)
 #define FTRP(bp) ((char *)(bp) + GET_SIZE(HDRP(bp)) - DSIZE)
 
+/* pointer to the memory where stores next/prev pointer */
 #define NEXT_PTR(bp) ((char *)(bp))
 #define PREV_PTR(bp) ((char *)(bp) + WSIZE)
 
+/* pointer to logical next or prev block */
 #define NEXT_FREE_BLKP(bp) ((char *)(*(unsigned int *)(NEXT_PTR(bp))))
 #define PREV_FREE_BLKP(bp) ((char *)(*(unsigned int *)(PREV_PTR(bp))))
 
+/* pointer to physical next or prev block */ 
 #define NEXT_BLKP(bp) ((char *)(bp) + GET_SIZE(HDRP(bp)))
 #define PREV_BLKP(bp) ((char *)(bp) - GET_SIZE(HDRP(bp)-WSIZE))
 
@@ -324,17 +335,3 @@ void *mm_realloc(void *ptr, size_t size)
     mm_free(old_ptr);
     return new_ptr;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
